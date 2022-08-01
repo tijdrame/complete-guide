@@ -13,4 +13,8 @@ export class AlertComponent {
     onClose(){
         this.close.emit();
     }
+
+    private ShowErrorAlert(){
+        
+    }
 }
