@@ -2,10 +2,6 @@ import { Ingredient } from "../../shared/ingredient.model";
 //import { ADD_INGREDIENT } from "./shopping-list.action";
 import * as ShlistActions from "./shopping-list.action";
 
-export interface AppState {
-    shoppingList: State;
-    // on peut avoir plusieurs state par la suite
-}
 export interface State {
     ingredients: Ingredient[];
     editedIngredient: Ingredient;
