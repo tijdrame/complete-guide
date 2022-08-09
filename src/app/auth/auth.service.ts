@@ -33,7 +33,7 @@ export class AuthService {
     constructor(private http: HttpClient, private router: Router,
         private store: Store<fromApp.AppState>) { }
 
-    signUp(email: string, password: string) {
+    /*signUp(email: string, password: string) {
         return this.http.post<AuthResponseData>(this.urlSignUp,
             { email: email, password: password, returnSecureToken: true }
         ).pipe(
@@ -48,7 +48,7 @@ export class AuthService {
             }
             return throwError(errorMessage);
         })*/
-            catchError(this.handdleError), tap(respData =>
+           /* catchError(this.handdleError), tap(respData =>
                 this.handdleAuthentication(email, respData.localId, respData.idToken, +respData.expiresIn)
                 //gerer par la fonction handdleAuthentication
                 /*{
@@ -56,7 +56,7 @@ export class AuthService {
                 const user = new User(respData.email, respData.localId, respData.idToken, expirationDate);
                 this.user.next(user);
             }*/
-            ));
+            /*));
     }
 
     login(email: string, password: string) {
@@ -70,64 +70,77 @@ export class AuthService {
                 const user = new User(respData.email, respData.localId, respData.idToken, expirationDate);
                 this.user.next(user);
             }*/
-            ));
+            /*));
     }
 
-    logout() {
+    /*logout() {
         //this.user.next(null);
         this.store.dispatch(new AuthActions.Logout());
         // localStorage.clear(); efface tout, pas forcément ce que l'on veut    
-        this.router.navigate(['/auth']);
+        //this.router.navigate(['/auth']);
         localStorage.removeItem('userData');
-        if(this.tokenExpirationTimer) {
+        if (this.tokenExpirationTimer) {
             clearTimeout(this.tokenExpirationTimer);
         }
         this.tokenExpirationTimer = null;
 
-    }
+    }*/
 
-    autoLogout(expirationDuration: number){
+    setLogoutTimer(expirationDuration: number) {
         console.log(expirationDuration);
         this.tokenExpirationTimer = setTimeout(() => {
-            this.logout();
+            this.store.dispatch(
+                new AuthActions.Logout()
+            );
         }, expirationDuration);
     }
 
-    private handdleAuthentication(email: string, userId: string, token: string, expiresIn: number) {
+    clearLogoutTimer(){
+        if(this.tokenExpirationTimer){
+            clearTimeout(this.tokenExpirationTimer);
+            this.tokenExpirationTimer = null;
+        }
+    }
+
+    /*private handdleAuthentication(email: string, userId: string, token: string, expiresIn: number) {
         const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
         const user = new User(email, userId, token, expirationDate);
         //this.user.next(user);
-        this.store.dispatch(new AuthActions.Login({email:email,  userId: userId, 
-            token:token, expirationDate: expirationDate}));
+        this.store.dispatch(new AuthActions.AuthenticateSuccess({
+            email: email, userId: userId,
+            token: token, expirationDate: expirationDate
+        }));
         this.autoLogout(expiresIn * 1000);
         localStorage.setItem('userData', JSON.stringify(user));
-    }
+    }*/
 
-    autoLogin(){
-        const userData: {email: string; id: string;_token: string; _tokenExpirationDate: string;} = JSON.parse(localStorage.getItem('userData'));
-    if (!userData) 
-      return;
-    
+    /*autoLogin() {
+        const userData: { email: string; id: string; _token: string; _tokenExpirationDate: string; } = JSON.parse(localStorage.getItem('userData'));
+        if (!userData)
+            return;
 
-    const loadedUser = new User(
-      userData.email,
-      userData.id,
-      userData._token,
-      new Date(userData._tokenExpirationDate)
-    );
 
-    if (loadedUser.token) {
-      //this.user.next(loadedUser);
-      this.store.dispatch(new AuthActions.Login({email: loadedUser.email, userId:loadedUser.id,
-         token: loadedUser.token, expirationDate: new Date(userData._tokenExpirationDate)}))
-      const expirationDuration =
-        new Date(userData._tokenExpirationDate).getTime() -
-        new Date().getTime();
-      this.autoLogout(expirationDuration);
-    }
-    }
+        const loadedUser = new User(
+            userData.email,
+            userData.id,
+            userData._token,
+            new Date(userData._tokenExpirationDate)
+        );
 
-    private handdleError(errorResp: HttpErrorResponse) {
+        if (loadedUser.token) {
+            //this.user.next(loadedUser);
+            this.store.dispatch(new AuthActions.AuthenticateSuccess({
+                email: loadedUser.email, userId: loadedUser.id,
+                token: loadedUser.token, expirationDate: new Date(userData._tokenExpirationDate)
+            }))
+            const expirationDuration =
+                new Date(userData._tokenExpirationDate).getTime() -
+                new Date().getTime();
+            this.autoLogout(expirationDuration);
+        }
+    }*/
+
+    /*private handdleError(errorResp: HttpErrorResponse) {
         let errorMessage = 'An unknown error occured!';
         if (!errorResp.error || !errorResp.error.error) return throwError(errorMessage);
         switch (errorResp.error.error.message) {
@@ -146,5 +159,5 @@ export class AuthService {
         }
         return throwError(errorMessage);
 
-    }
+    }*/
 }
